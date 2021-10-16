@@ -30,13 +30,13 @@ provider "helm" {
 }
 
 terraform {
-  backend "azurerm" {
-    subscription_id      = "bc7bfc73-03d0-4d96-9ba8-5601291a0f2d"
-    resource_group_name  = "terraform_state_rg"
-    storage_account_name = "terraforminfinitesa"
-    container_name       = "tf-infinite-aks-container"
-    key                  = "terraform.tfstate"
-  }
+  # backend "azurerm" {
+  #   subscription_id      = "bc7bfc73-03d0-4d96-9ba8-5601291a0f2d"
+  #   resource_group_name  = "terraform_state_rg"
+  #   storage_account_name = "terraforminfinitesa"
+  #   container_name       = "tf-infinite-aks-container"
+  #   key                  = "terraform.tfstate"
+  # }
 }
 
 data "azurerm_dns_zone" "dns_zone" {
