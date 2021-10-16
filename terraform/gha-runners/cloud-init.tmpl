@@ -1,0 +1,61 @@
+#cloud-config:
+package_update: true
+package_upgrade: true
+
+packages:
+  # Required for GitHub runner
+  - zlib1g
+  - libssl1.1
+  - libicu60
+  - libkrb5-3
+  - liblttng-ust-ctl4
+  - liblttng-ust0
+  - liburcu6
+  # Required for Docker
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - gnupg-agent
+  - software-properties-common
+  # Required for the token extraction below
+  - jq
+runcmd:
+  # install JQ
+  - apt-get -y install jq
+  # install unzip
+  - apt-get -y install unzip
+  # set symbolic link for NodeJs
+  - apt-get -y update
+  - apt-get -y install nodejs
+  - ln -s /usr/bin/nodejs /usr/bin/node
+  - npm i -g npm
+  # install Azure CLI
+  # - curl -sL https://aka.ms/InstallAzureCLIDeb | bash
+  # Steps for Docker
+  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+  - add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+  - apt-get -y update
+  - apt-get -y install docker-ce docker-ce-cli containerd.io
+  - systemctl start docker
+  - systemctl enable docker
+  # Creating a build-cache folder
+  - mkdir /build-cache
+  # Steps for GitHub runner
+  - mkdir /actions-runner
+  - cd /actions-runner
+  - curl -O -L ${gha_runner_app_download_url} # Extract the installer
+  - tar xzf ./${gha_runner_app_downloaded_filename}
+  # RUNNER_ALLOW_RUNASROOT=1 to allow the below to run as root (because that's what happens since the runner is configured & run as part of cloud-init)
+  # Get runner registration token
+  - 'RUNNERTOKEN=$(curl -s -XPOST -H "authorization: token ${gh_pat_to_get_runner_reg_token}" ${gha_runner_reg_token_url} | jq -r .token)'
+  # Deregister runner if any and register to the configured org/repo
+  # Deregistering is not possible with Cloud-init in VMSS as the registration files will be lost due to the instance reimage action if any changes in Cloud-int
+  # - echo "Deregistering runner with exisitng org if any"
+  # - RUNNER_ALLOW_RUNASROOT=1 ./config.sh remove --token $RUNNERTOKEN --unattended
+  - echo "Registering runner"
+  - RUNNER_ALLOW_RUNASROOT=1 ./config.sh --url ${gh_org_or_repo_url} --token $RUNNERTOKEN --unattended
+  # - RUNNER_ALLOW_RUNASROOT=1 ./config.sh --url ${gh_org_or_repo_url} --token AAAEGZR7H34HSHJF4XMDLQDBNDVVK --unattended
+  # - RUNNER_ALLOW_RUNASROOT=1 ./run.sh --unattended
+  - RUNNER_ALLOW_RUNASROOT=1 ./svc.sh install
+  - RUNNER_ALLOW_RUNASROOT=1 ./svc.sh start
+  - RUNNER_ALLOW_RUNASROOT=1 ./svc.sh status

@@ -1,0 +1,98 @@
+name: GHA Runners - DFSAAP
+on:
+  # pull_request:
+  #   branches:
+  #     - main
+  workflow_dispatch:
+
+env:
+  ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID}}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID}}
+  ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID}}
+  ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET}}
+
+  TF_VAR_gh_pat_to_get_runner_reg_token: ${{ secrets.GH_PAT_TO_GET_RUNNER_REG_TOKEN }}
+  TF_VAR_gha_runner_reg_token_url: https://git.daimler.com/api/v3/orgs/dfsaap/actions/runners/registration-token
+  TF_VAR_gh_org_or_repo_url: https://git.daimler.com/dfsaap
+  TF_VAR_gha_runners_count: 1
+
+  tf_actions_working_dir: ./terraform/gha-runners
+  tf_workspace: gha-runners-dfsaap
+
+jobs:
+  tf-plan:
+    name: "Terraform Plan"
+    runs-on: self-hosted
+    environment: gha-runners-dfsaap-tfplan
+
+    defaults:
+      run:
+        working-directory: ${{ env.tf_actions_working_dir }}
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: hashicorp/setup-terraform@v1
+
+      - name: Terraform fmt
+        id: fmt
+        run: terraform fmt -check
+        continue-on-error: true
+
+      - name: Terraform Init
+        id: init
+        run: terraform init
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+
+      - name: Terraform Select Workspace
+        id: select-workspace
+        run: terraform workspace select ${tf_workspace} || terraform workspace new ${tf_workspace}
+
+      - name: Create TFPLAN folder if not exist
+        run: mkdir -p tfplan
+
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -out ${tf_workspace}.tfplan -no-color
+
+      - name: Upload TF Plan Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: tfplan
+          path: ${{ env.tf_actions_working_dir }}/${{ env.tf_workspace }}.tfplan
+
+  tf-apply:
+    name: "Terraform Apply"
+    runs-on: self-hosted
+    environment: gha-runners-dfsaap-tfapply
+
+    defaults:
+      run:
+        working-directory: ${{ env.tf_actions_working_dir }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v1
+
+      - name: Terraform Init
+        id: init
+        run: terraform init
+
+      - name: Terraform Select Workspace
+        id: select-workspace
+        run: terraform workspace select ${tf_workspace} || terraform workspace new ${tf_workspace}
+
+      - name: Download TF Plan Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: tfplan
+          path: ${{ env.tf_actions_working_dir }}/
+
+      - name: Terraform Apply
+        id: apply
+        run: terraform apply ${tf_workspace}.tfplan -no-color

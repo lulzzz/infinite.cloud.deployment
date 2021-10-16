@@ -1,0 +1,1 @@
+This repository is intended to host cloud deployment related including IaC implementation (terraform)

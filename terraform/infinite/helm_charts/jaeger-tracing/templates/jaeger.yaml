@@ -1,0 +1,16 @@
+apiVersion: jaegertracing.io/v1
+kind: "Jaeger"
+metadata:
+  name: jaeger
+spec:
+  strategy: allInOne
+  env:
+    name: COLLECTOR_ZIPKIN_HTTP_PORT
+    value: 9411
+  ingress:
+    enabled: false
+  allInOne:
+    image: jaegertracing/all-in-one:1.21 # Need to find how to enable zipkin support in v1.22.0
+    options:
+      query:
+        base-path: /tracing/jaeger

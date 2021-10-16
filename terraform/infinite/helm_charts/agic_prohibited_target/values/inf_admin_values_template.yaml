@@ -1,0 +1,6 @@
+agicProhibitTargetName: ${agicProhibitTargetName}
+
+hostname: ${hostname}
+
+paths: 
+  - "/Admin/*"

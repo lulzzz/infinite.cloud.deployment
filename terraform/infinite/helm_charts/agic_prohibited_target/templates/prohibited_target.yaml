@@ -1,0 +1,12 @@
+apiVersion: "appgw.ingress.k8s.io/v1"
+kind: AzureIngressProhibitedTarget
+metadata:
+  name: {{ .Values.agicProhibitTargetName }}
+spec:
+  {{- if not (eq .Values.hostname "*") }}
+  hostname: {{ .Values.hostname }}
+  {{- end }}
+  {{- with .Values.paths }}
+  paths:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}

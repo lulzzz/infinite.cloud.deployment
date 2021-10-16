@@ -1,0 +1,15 @@
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: dapr_crd_name
+  namespace: ns
+
+# sample spec for a pubsub subscription
+spec:
+  topic: testtopic
+  route: /receivemessage
+  pubsubname: pubsub
+
+scope:
+  scopeEnabled: false
+  subscribingAppName: RequiredOnlyIfScopeEnabled

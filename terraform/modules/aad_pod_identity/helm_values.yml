@@ -1,0 +1,6 @@
+adminsecret:
+   cloud: "AzurePublicCloud"
+   vmType: vmss
+   clientID: msi
+   clientSecret: msi
+   useMSI: "true"

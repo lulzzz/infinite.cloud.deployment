@@ -1,0 +1,15 @@
+apiVersion: {{ .Values.apiVersion }}
+kind: {{ .Values.kind }}
+metadata:
+  name: {{ .Values.metadata.name }}
+  namespace: {{ .Values.metadata.namespace }}
+
+{{- with .Values.spec }}
+spec:
+  {{- toYaml . | nindent 2 }}
+{{- end }}
+
+{{- if .Values.scope.scopeEnabled }}
+scopes:
+- {{ .Values.scope.subscribingAppName }}
+{{- end }}

@@ -1,0 +1,23 @@
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: ${name}
+  namespace: ${namespace}
+
+# sample spec for a pubsub subscription
+spec:
+  type: pubsub.azure.eventhubs
+  version: v1
+  metadata:
+  - name: connectionString
+    value: ${eventhub_connectionstring}
+  - name: storageAccountName
+    value: ${stroge_account_name}
+  - name: storageAccountKey
+    value: ${stroge_account_key}
+  - name: storageContainerName
+    value: ${storage_container_name}
+
+scope:
+  scopeEnabled: false
+  subscribingAppName: RequiredOnlyIfScopeEnabled

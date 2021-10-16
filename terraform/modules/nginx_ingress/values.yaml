@@ -1,0 +1,17 @@
+controller:
+  replicaCount: ${replica_count}
+  service:
+    loadBalancerIP: ${ingress_public_ip_address}
+
+  # service:
+  #   loadBalancerIP: ${load_balancer_ip}
+  #   annotations:
+  #     service.beta.kubernetes.io/azure-load-balancer-internal: ${is_internal}
+
+  podAnnotations:
+    dapr.io/enabled: "true"
+    dapr.io/app-id: "nginx-ingress"
+    dapr.io/app-protocol: "http"
+    dapr.io/app-port: "80"
+    dapr.io/log-as-json: "true"
+    dapr.io/config: "jaeger-tracing"

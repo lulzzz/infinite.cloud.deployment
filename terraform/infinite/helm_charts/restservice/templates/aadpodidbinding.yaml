@@ -1,0 +1,14 @@
+{{- if .Values.armAuth -}}
+{{- if eq .Values.armAuth.type "aadPodIdentity"}}
+
+# Please see https://github.com/Azure/aad-pod-identity for more inromation
+apiVersion: "aadpodidentity.k8s.io/v1"
+kind: AzureIdentityBinding
+metadata:
+  name: {{ template "restservice.azureidbinding" . }}
+spec: 
+  azureIdentity: {{ template "restservice.azureidentity" . }}
+  selector: {{ template "restservice.fullname" . }}
+
+{{- end}}
+{{- end}}

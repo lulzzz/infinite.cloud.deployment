@@ -1,0 +1,21 @@
+global:    
+  # tag: 1.1.0-rc.1
+
+  logAsJson: true
+
+  ha:
+    enabled: true
+
+  prometheus:
+    enabled: true
+    port: 9090
+
+  mtls:
+    enabled: true
+
+dapr_dashboard:
+  replicaCount: 1
+  logLevel: error
+  serviceType: ClusterIP
+  resources: {} # Empty means no resource limit, can set limit memory, cpu etc,
+  

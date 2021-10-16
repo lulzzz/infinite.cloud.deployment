@@ -1,0 +1,45 @@
+name: Infinite - BNL INT-UAT - TF Apply
+
+on:
+  #push:
+  #  branches:
+  #    - main
+  workflow_dispatch:
+
+env:
+  ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID}}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID}}
+  ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID}}
+  ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET}}
+
+  tf_actions_working_dir: ./terraform/infinite
+  tf_workspace: bnlintuat
+
+jobs:
+  terraform-apply:
+    name: 'Terraform Apply'
+    runs-on: self-hosted
+    environment: bnlintuat
+    
+    defaults:
+      run:
+        working-directory: ${{ env.tf_actions_working_dir }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install Terraform
+      uses: hashicorp/setup-terraform@v1
+
+    - name: Terraform Init
+      id: init
+      run: terraform init
+
+    - name: Terraform Select Workspace
+      id: select-workspace
+      run: terraform workspace select ${environment} || terraform workspace new ${environment}
+
+    - name: Terraform Apply
+      id: apply
+      run: terraform apply -var-file ./configurations/${tf_workspace}/${tf_workspace}.tfvars -var-file ./configurations/developer_sql_ip_rules.tfvars -auto-approve -no-color

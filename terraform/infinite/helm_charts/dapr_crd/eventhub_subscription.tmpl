@@ -1,0 +1,15 @@
+apiVersion: dapr.io/v1alpha1
+kind: Subscription
+metadata:
+  name: ${name}
+  namespace: ${namespace}
+
+# sample spec for a pubsub subscription
+spec:
+  topic: ${eventhub_name}
+  route: ${subscribing_app_endpoint}
+  pubsubname: ${pubsub_name}
+
+scope:
+  scopeEnabled: true
+  subscribingAppName: ${dapr_app_id}

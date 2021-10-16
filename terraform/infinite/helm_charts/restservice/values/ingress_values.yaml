@@ -1,0 +1,24 @@
+ingress:
+  enabled: true
+  annotations: #{}
+    # kubernetes.io/ingress.class: azure/application-gateway
+    # appgw.ingress.kubernetes.io/backend-path-prefix: ${backed_path_prefix}
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt"
+    kubernetes.io/tls-acme: "true"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: ${backed_path_prefix}
+  hosts:
+    - host: ${host_name}
+      paths:
+      - path: ${path}
+        pathType: Prefix
+        backend:
+          serviceName: ${service_name}
+          servicePort: 80
+  
+  tls: 
+   - secretName: tls-secret
+     hosts:
+       - ${host_name}

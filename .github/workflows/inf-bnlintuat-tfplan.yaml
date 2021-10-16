@@ -1,0 +1,81 @@
+name: Infinite - BNL INT-UAT - TF Plan
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID}}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID}}
+  ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID}}
+  ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET}}
+
+  tf_actions_working_dir: ./terraform/infinite
+  tf_workspace: bnlintuat
+
+jobs:
+  terraform-plan:
+    name: 'Terraform Plan'
+    runs-on: self-hosted
+    environment: bnlintuat
+    
+    defaults:
+      run:
+        working-directory: ${{ env.tf_actions_working_dir }}
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: hashicorp/setup-terraform@v1
+
+    - name: Terraform fmt
+      id: fmt
+      run: terraform fmt -check
+      continue-on-error: true
+
+    - name: Terraform Init
+      id: init
+      run: terraform init
+
+    - name: Terraform Validate
+      id: validate
+      run: terraform validate -no-color
+
+    - name: Terraform Select Workspace
+      id: select-workspace
+      run: terraform workspace select ${tf_workspace} || terraform workspace new ${tf_workspace}
+
+    - name: Terraform Plan
+      id: plan
+      run: terraform plan -var-file ./configurations/${tf_workspace}/${tf_workspace}.tfvars  -var-file ./configurations/developer_sql_ip_rules.tfvars -no-color
+      continue-on-error: true
+
+    # - uses: actions/github-script@v5
+    #   if: github.event_name == 'pull_request'
+    #   env:
+    #     PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+    #   with:
+    #     github-token: ${{ secrets.GITHUB_TOKEN }}
+    #     script: |
+    #       const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
+    #       #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
+    #       #### Terraform Validation 🤖\`${{ steps.validate.outputs.stdout }}\`
+    #       #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
+          
+    #       <details><summary>Show Plan</summary>
+          
+    #       \`\`\`\n
+    #       ${process.env.PLAN}
+    #       \`\`\`
+          
+    #       </details>
+          
+    #       *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ env.tf_actions_working_dir }}\`, Workflow: \`${{ github.workflow }}\`*`;
+            
+    #       github.issues.createComment({
+    #         issue_number: context.issue.number,
+    #         owner: context.repo.owner,
+    #         repo: context.repo.repo,
+    #         body: output
+    #       })
