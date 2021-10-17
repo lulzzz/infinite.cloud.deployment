@@ -4,10 +4,10 @@
   {{- range .abacus.paths }}
   http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $host.host }}{{ .path }}
   {{- end }}
-  {{- range .abacusconfig.paths }}
+  {{- range .abacusConfig.paths }}
   http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $host.host }}{{ .path }}
   {{- end }}
-  {{- range .abacusportal.paths }}
+  {{- range .abacusPortal.paths }}
   http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $host.host }}{{ .path }}
   {{- end }}
 {{- end }}
