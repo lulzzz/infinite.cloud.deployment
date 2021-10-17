@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  abacus:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2021-10-17T18:04:49.708164+08:00"
+    description: A Helm chart for Kubernetes
+    digest: 6667209cef73e6837d687ef2ea4f87f04d7d9c93468b2124be804b994e085ad2
+    name: abacus
+    type: application
+    urls:
+    - https://logamanig.github.io/infinite.cloud.deployment/abacus-0.1.0.tgz
+    version: 0.1.0
+generated: "2021-10-17T18:04:49.707325+08:00"
