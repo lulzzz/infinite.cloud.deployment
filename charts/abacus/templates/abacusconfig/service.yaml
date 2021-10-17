@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "abacusConfig.fullname" . }}
+  labels:
+    {{- include "abacusConfig.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.abacusConfig.service.type }}
+  ports:
+    - port: {{ .Values.abacusConfig.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "abacusConfig.selectorLabels" . | nindent 4 }}

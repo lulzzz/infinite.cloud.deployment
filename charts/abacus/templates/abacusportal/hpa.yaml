@@ -1,0 +1,28 @@
+{{- if .Values.abacusPortal.autoscaling.enabled }}
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "abacusPortal.fullname" . }}
+  labels:
+    {{- include "abacusPortal.labels" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "abacusPortal.fullname" . }}
+  minReplicas: {{ .Values.abacusPortal.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.abacusPortal.autoscaling.maxReplicas }}
+  metrics:
+    {{- if .Values.abacusPortal.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        targetAverageUtilization: {{ .Values.abacusPortal.autoscaling.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if .Values.abacusPortal.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        targetAverageUtilization: {{ .Values.abacusPortal.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- end }}
+{{- end }}

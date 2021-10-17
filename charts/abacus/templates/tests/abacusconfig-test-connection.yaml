@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "abacusConfig.fullname" . }}-test-connection"
+  labels:
+    {{- include "abacusConfig.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ include "abacusConfig.fullname" . }}:{{ .Values.abacusConfig.service.port }}']
+  restartPolicy: Never
