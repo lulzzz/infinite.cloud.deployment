@@ -8,26 +8,27 @@ imagePullSecrets: []
 
 ingress:
   enabled: true
-  className: ""
+  className: "nginx"
   annotations: #{}
     kubernetes.io/ingress.class: nginx
     kubernetes.io/tls-acme: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
   hosts:
     - host: "chart-example.local"
       #Abacus
       abacus:
         paths:
-          - path: /abacusservice
+          - path: /abacusservice(/|$)(.*)
             pathType: ImplementationSpecific
       #AbacusConfig
       abacusConfig:
         paths:
-          - path: /abacusconfigservice
+          - path: /abacusconfigservice(/|$)(.*)
             pathType: ImplementationSpecific
       #AbacusPortal
       abacusPortal:
         paths:
-          - path: /abacusportalservice
+          - path: /abacusportal(/|$)(.*)
             pathType: ImplementationSpecific
   tls: []
   #  - secretName: chart-example-tls
