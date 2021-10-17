@@ -17,6 +17,11 @@ variable "public_ip_resource_group_name" {
   default     = null
 }
 
+variable "namespaces" {
+  type        = list(string)
+  description = "List of namespaces to be created"
+}
+
 variable "prefix" {
   description = "The prefix for the resources created in the specified Azure Resource Group"
   type        = string
@@ -287,5 +292,5 @@ variable "enable_aci_connector_linux" {
 }
 
 variable "aks_environment_name" {
-  
+
 }

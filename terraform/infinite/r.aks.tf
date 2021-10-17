@@ -33,6 +33,7 @@ module "aks" {
   cluster_admin_sp_principal_id          = data.azurerm_client_config.current.object_id
   aks_environment_name                   = var.aks_environment_name
   public_ip_resource_group_name          = var.public_ip_resource_group_name
+  namespaces                             = keys(var.environments)
 
   nodes_labels = {
     "nodepool" : var.k8s_node_labels
